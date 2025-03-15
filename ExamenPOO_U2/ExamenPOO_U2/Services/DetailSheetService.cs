@@ -3,47 +3,45 @@ using ExamenPOO_U2.Constants;
 using ExamenPOO_U2.Database;
 using ExamenPOO_U2.Database.Entities;
 using ExamenPOO_U2.Dtos.Common;
+using ExamenPOO_U2.Dtos.DetailSheet;
 using ExamenPOO_U2.Dtos.Employees;
 using ExamenPOO_U2.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
-using HttpStatusCode = ExamenPOO_U2.Constants.HttpStatusCode;
 
 namespace ExamenPOO_U2.Services
 {
-    public class EmployeesService : IEmployeesService
+    public class DetailSheetService : IDetailSheetService
     {
         private readonly PlanillaDbContext _context;
         private readonly IMapper _mapper;
 
-        public EmployeesService(PlanillaDbContext context, IMapper mapper)
+        public DetailSheetService(PlanillaDbContext context, IMapper mapper)
         {
-            
             _context = context;
             _mapper = mapper;
         }
 
-        public async Task<ResponseDto<List<EmployeeDto>>> GetListAsync()
+        public async Task<ResponseDto<List<DetailSheetDto>>> GetListAsync()
         {
-            var employeeEntity = await _context.Employees.ToListAsync();
-            var employeeDto = _mapper.Map<List<EmployeeDto>>(employeeEntity);
+            var detailSheetEntity = await _context.DetailSheets.ToListAsync();
+            var detailSheetDto = _mapper.Map<List<DetailSheetDto>>(detailSheetEntity);
 
-            return new ResponseDto<List<EmployeeDto>>
+            return new ResponseDto<List<DetailSheetDto>>
             {
                 StatusCode = HttpStatusCode.OK,
                 Status = true,
-                Message = employeeEntity.Count() > 0 ? "Registros encontrados" : "No se encontraron registros",
-                Data = employeeDto
+                Message = detailSheetEntity.Count() > 0 ? "Registros encontrados" : "No se encontraron registros",
+                Data = detailSheetDto
             };
         }
 
-       public async Task<ResponseDto<EmployeeDto>> GetOneByIdAsync(Guid id)
+        public async Task<ResponseDto<DetailSheetDto>> GetOneByIdAsync(Guid id)
         {
-            var employeeEntity = await _context.Employees.FirstOrDefaultAsync(x => x.Id == id);
+            var detailSheetEntity = await _context.DetailSheets.FirstOrDefaultAsync(x => x.Id == id);
 
-            if (employeeEntity == null)
+            if (detailSheetEntity == null)
             {
-                return new ResponseDto<EmployeeDto>
+                return new ResponseDto<DetailSheetDto>
                 {
                     StatusCode = HttpStatusCode.NOT_FOUND,
                     Status = false,
@@ -51,30 +49,30 @@ namespace ExamenPOO_U2.Services
                 };
             }
 
-            return new ResponseDto<EmployeeDto>
+            return new ResponseDto<DetailSheetDto>
             {
                 StatusCode = HttpStatusCode.OK,
-                Status = true,
+                Status = false,
                 Message = "Registro encontrado",
-                Data = _mapper.Map<EmployeeDto>(employeeEntity)
+                Data = _mapper.Map<DetailSheetDto>(detailSheetEntity)
             };
         }
 
-       public async Task<ResponseDto<EmployeeActionResponseDto>> CreateAsync(Dtos.Employees.EmployeeCreateDto dto)
+        public async Task<ResponseDto<DetailSheetActionResponseDto>> CreateAsync(DetailSheetCreateDto dto)
         {
             try
             {
-                var employeeEntity = _mapper.Map<EmployeeEntity>(dto);
+                var detailSheetEntity = _mapper.Map<DetailSheetEntity>(dto);
 
-                _context.Employees.Add(employeeEntity);
+                _context.DetailSheets.Add(detailSheetEntity);
                 await _context.SaveChangesAsync();
 
-                return new ResponseDto<EmployeeActionResponseDto>
+                return new ResponseDto<DetailSheetActionResponseDto>
                 {
                     StatusCode = (int)HttpStatusCode.CREATED,
                     Status = true,
                     Message = "Registro creado Correctamente",
-                    Data = _mapper.Map<EmployeeActionResponseDto>(employeeEntity)
+                    Data = _mapper.Map<DetailSheetActionResponseDto>(detailSheetEntity)
                 };
             }
             catch (Exception e)
@@ -83,25 +81,25 @@ namespace ExamenPOO_U2.Services
                 Console.WriteLine(e.Message);
 
 
-                return new ResponseDto<EmployeeActionResponseDto>
+                return new ResponseDto<DetailSheetActionResponseDto>
                 {
                     StatusCode = (int)(HttpStatusCode.INTERNAL_SERVER_ERROR),
                     Status = false,
                     Message = "Error interno en el servidor, contacte al administrador",
                 };
             }
-          
+
         }
 
-        public async Task<ResponseDto<EmployeeActionResponseDto>> EditAsync(EmployeeEditDto dto, Guid id)
+        public async Task<ResponseDto<DetailSheetActionResponseDto>> EditAsync(DetailSheetEditDto dto, Guid id)
         {
             try
             {
-                var employeeEntity = await _context.Employees.FirstOrDefaultAsync(x => x.Id == id);
+                var detailSheetEntity = await _context.DetailSheets.FirstOrDefaultAsync(x => x.Id == id);
 
-                if (employeeEntity == null)
+                if (detailSheetEntity == null)
                 {
-                    return new ResponseDto<EmployeeActionResponseDto>
+                    return new ResponseDto<DetailSheetActionResponseDto>
                     {
                         StatusCode = HttpStatusCode.NOT_FOUND,
                         Status = false,
@@ -109,16 +107,16 @@ namespace ExamenPOO_U2.Services
                     };
                 }
 
-                _mapper.Map<EmployeeEditDto, EmployeeEntity>(dto, employeeEntity);
-                _context.Employees.Update(employeeEntity);
+                _mapper.Map<DetailSheetEditDto, DetailSheetEntity>(dto, detailSheetEntity);
+                _context.DetailSheets.Update(detailSheetEntity);
                 await _context.SaveChangesAsync();
 
-                return new ResponseDto<EmployeeActionResponseDto>
+                return new ResponseDto<DetailSheetActionResponseDto>
                 {
                     StatusCode = HttpStatusCode.OK,
                     Status = true,
                     Message = "Registro modificado correctamente",
-                    Data = _mapper.Map<EmployeeActionResponseDto>(employeeEntity)
+                    Data = _mapper.Map<DetailSheetActionResponseDto>(detailSheetEntity)
                 };
             }
 
@@ -126,7 +124,7 @@ namespace ExamenPOO_U2.Services
             {
                 Console.WriteLine(e.Message);
 
-                return new ResponseDto<EmployeeActionResponseDto>
+                return new ResponseDto<DetailSheetActionResponseDto>
                 {
                     StatusCode = HttpStatusCode.INTERNAL_SERVER_ERROR,
                     Status = false,
@@ -136,13 +134,13 @@ namespace ExamenPOO_U2.Services
             }
         }
 
-        public async Task<ResponseDto<EmployeeActionResponseDto>> DeleteAsync(Guid id)
+        public async Task<ResponseDto<DetailSheetActionResponseDto>> DeleteAsync(Guid id)
         {
-            var employeeEntity = await _context.Employees.FirstOrDefaultAsync(x => x.Id == id);
+            var detailSheetEntity = await _context.DetailSheets.FirstOrDefaultAsync(x => x.Id == id);
 
-            if (employeeEntity == null)
+            if (detailSheetEntity == null)
             {
-                return new ResponseDto<EmployeeActionResponseDto>
+                return new ResponseDto<DetailSheetActionResponseDto>
                 {
                     StatusCode = HttpStatusCode.NOT_FOUND,
                     Status = false,
@@ -150,18 +148,17 @@ namespace ExamenPOO_U2.Services
                 };
             }
 
-            _context.Employees.Remove(employeeEntity);
+            _context.DetailSheets.Remove(detailSheetEntity);
             await _context.SaveChangesAsync();
 
-            return new ResponseDto<EmployeeActionResponseDto>
+            return new ResponseDto<DetailSheetActionResponseDto>
             {
                 StatusCode = HttpStatusCode.OK,
                 Status = true,
                 Message = "Registro borrado correctamente",
-                Data = _mapper.Map<EmployeeActionResponseDto>(employeeEntity),
+                Data = _mapper.Map<DetailSheetActionResponseDto>(detailSheetEntity),
             };
 
         }
-
     }
 }

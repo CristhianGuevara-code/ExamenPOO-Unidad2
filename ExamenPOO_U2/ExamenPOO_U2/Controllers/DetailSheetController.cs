@@ -1,26 +1,28 @@
 ﻿using ExamenPOO_U2.Dtos.Common;
+using ExamenPOO_U2.Dtos.DetailSheet;
 using ExamenPOO_U2.Dtos.Employees;
+using ExamenPOO_U2.Services;
 using ExamenPOO_U2.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamenPOO_U2.Controllers
 {
     [ApiController]
-    [Route("api/employess")]
-    public class EmployeesController : ControllerBase
+    [Route("api/detailsheets")]
+    public class DetailSheetController : ControllerBase
     {
-        private readonly IEmployeesService _employeesService;
+        private readonly IDetailSheetService _detailSheetService;
 
-        public EmployeesController(IEmployeesService employeesService)
+        public DetailSheetController(IDetailSheetService detailSheetService)
         {
-            _employeesService = employeesService;
+            _detailSheetService = detailSheetService;
         }
 
         //Obtener lista
         [HttpGet]
-        public async Task<ActionResult<ResponseDto<List<EmployeeDto>>>> GetList()
+        public async Task<ActionResult<ResponseDto<List<DetailSheetDto>>>> GetList()
         {
-            var response = await _employeesService.GetListAsync();
+            var response = await _detailSheetService.GetListAsync();
 
             return StatusCode(response.StatusCode, new
             {
@@ -33,9 +35,9 @@ namespace ExamenPOO_U2.Controllers
 
         //Obtener uno
         [HttpGet("{id}")]
-        public async Task<ActionResult<ResponseDto<EmployeeDto>>> GetOne(Guid id)
+        public async Task<ActionResult<ResponseDto<DetailSheetDto>>> GetOne(Guid id)
         {
-            var response = await _employeesService.GetOneByIdAsync(id);
+            var response = await _detailSheetService.GetOneByIdAsync(id);
 
             return StatusCode(response.StatusCode, new
             {
@@ -47,9 +49,9 @@ namespace ExamenPOO_U2.Controllers
 
         //Crear
         [HttpPost]
-        public async Task<ActionResult<ResponseDto<EmployeeActionResponseDto>>> Post([FromBody] Dtos.Employees.EmployeeCreateDto dto)
+        public async Task<ActionResult<ResponseDto<DetailSheetActionResponseDto>>> Post([FromBody] DetailSheetCreateDto dto)
         {
-            var response = await _employeesService.CreateAsync(dto);
+            var response = await _detailSheetService.CreateAsync(dto);
             return StatusCode(response.StatusCode, new
             {
                 response.Status,
@@ -59,10 +61,10 @@ namespace ExamenPOO_U2.Controllers
         }
 
         //Editar
-        [HttpPut("{id}")] 
-        public async Task<ActionResult<ResponseDto<EmployeeActionResponseDto>>> Edit([FromBody] EmployeeEditDto dto, Guid id)
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ResponseDto<EmployeeActionResponseDto>>> Edit([FromBody] DetailSheetEditDto dto, Guid id)
         {
-            var response = await _employeesService.EditAsync(dto, id);
+            var response = await _detailSheetService.EditAsync(dto, id);
 
             return StatusCode(response.StatusCode, response);
         }
@@ -71,7 +73,7 @@ namespace ExamenPOO_U2.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<ResponseDto<EmployeeActionResponseDto>>> Delete(Guid id)
         {
-            var response = await _employeesService.DeleteAsync(id);
+            var response = await _detailSheetService.DeleteAsync(id);
             return StatusCode(response.StatusCode, response);
         }
     }
